@@ -1,14 +1,14 @@
-# BtWatchdog
+# BtGuard
 
 ## Overview
 
-BtWatchdog is an Android app designed to actively monitor selected Bluetooth devices, notifying you when a device exits the Bluetooth range of your phone.
+BtGuard is an Android app designed to actively monitor selected Bluetooth devices, notifying you when a device exits the Bluetooth range of your phone.
 
 ## Key Features
 
 ### 1. Device Management UI
 
-BtWatchdog includes a built-in user interface that simplifies the management of monitored devices. With a user-friendly design, you can effortlessly add, remove, or modify devices that you want to keep track of.
+BtGuard includes a built-in user interface that simplifies the management of monitored devices. With a user-friendly design, you can effortlessly add, remove, or modify devices that you want to keep track of.
 
 ### 2. Notification Service
 
