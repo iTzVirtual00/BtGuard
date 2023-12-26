@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BtGuard</string>
+    <string name="add">add</string>
+    <string name="background_notification">BtWatchdog is running in the background</string>
+    <string name="device_lost_title">Device lost!</string>
+    <string name="edit_device">Edit device</string>
+    <string name="add_device">Add device</string>
+</resources>

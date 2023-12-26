@@ -1,0 +1,27 @@
+<!-- dialog_layout.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editDeviceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Device Name" />
+
+    <EditText
+        android:id="@+id/editDeviceAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Device Address" />
+
+    <EditText
+        android:id="@+id/editMaxRetries"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Max Retries"
+        android:inputType="number" />
+
+</LinearLayout>
