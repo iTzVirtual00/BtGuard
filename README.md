@@ -9,6 +9,7 @@ BtGuard is an Android app designed to actively monitor selected Bluetooth device
 ### 1. Device Management UI
 
 BtGuard includes a built-in user interface that simplifies the management of monitored devices. With a user-friendly design, you can effortlessly add, remove, or modify devices that you want to keep track of.
+You can use [nRFConnect](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-mobile) to get the `addresses` of your devices.
 
 ### 2. Notification Service
 
