@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.serialization.encodeToString
@@ -20,6 +21,7 @@ import me.itzvirtual.btguard.notifications.Notifications
 import me.itzvirtual.btguard.plugins.BleNotificationService
 import me.itzvirtual.btguard.plugins.DeviceAdapter
 import me.itzvirtual.btguard.plugins.Persistence
+import me.itzvirtual.btguard.plugins.SettingsDialog
 import me.itzvirtual.btguard.service.BluetoothWatchtowerService
 
 
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         notifications = Notifications(this)
         settings = getAppSettings()
         Intent(this, BluetoothWatchtowerService::class.java).also { intent ->
@@ -48,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             wtService = binder.getService()
             registerPlugins(wtService)
             wtService.pingManager.delay = getAppSettings().settings.retryDelay.toLong()
-            wtService.startBleScan()
+            wtService.restartBleScan()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {}
@@ -63,8 +66,15 @@ class MainActivity : AppCompatActivity() {
         Persistence(pingManager, this)
 
         binding = ActivityDeviceListBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+
+        val settingsIcon: ImageView = findViewById(R.id.settingsIcon)
+        val settingsDialog = SettingsDialog(pingManager)
+        settingsIcon.setOnClickListener {
+            settingsDialog.showDialog(this)
+        }
+
         deviceAdapter = DeviceAdapter(pingManager)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = deviceAdapter

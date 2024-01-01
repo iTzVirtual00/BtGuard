@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import me.itzvirtual.btguard.R
-import me.itzvirtual.btguard.databinding.DialogLayoutBinding
+import me.itzvirtual.btguard.databinding.DeviceDialogLayoutBinding
 import me.itzvirtual.btguard.databinding.ItemDeviceBinding
 import me.itzvirtual.btguard.logic.BluetoothDeviceState
 import me.itzvirtual.btguard.logic.PingEvents
@@ -76,7 +76,7 @@ class DeviceAdapter(private val pingManager: PingManager) :
 	}
 
 	fun showDialog(context: Context, device: BluetoothDeviceState? = null) {
-		val dialogView = DialogLayoutBinding.inflate(LayoutInflater.from(context))
+		val dialogView = DeviceDialogLayoutBinding.inflate(LayoutInflater.from(context))
 		val dialogBuilder = AlertDialog.Builder(context)
 			.setView(dialogView.root)
 			.setTitle(
@@ -109,8 +109,7 @@ class DeviceAdapter(private val pingManager: PingManager) :
 				pingManager.removeDevice(device)
 			}
 
-		val alertDialog = dialogBuilder.create()
-		alertDialog.show()
+		dialogBuilder.create().show()
 	}
 
 	fun runOnUiThread(action: Runnable) {

@@ -40,4 +40,10 @@ open class PingEventBus : PingEvents {
 			listener.onDeviceDataChanged(device, index)
 		}
 	}
+
+	override fun onDelayChanged(oldDelay: Long) {
+		for (listener in listeners) {
+			listener.onDelayChanged(oldDelay)
+		}
+	}
 }

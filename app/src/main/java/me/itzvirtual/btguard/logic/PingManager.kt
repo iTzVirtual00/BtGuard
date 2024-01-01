@@ -3,27 +3,30 @@ package me.itzvirtual.btguard.logic
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class PingManager(val eventBus: PingEventBus = PingEventBus(), var delay: Long) {
+class PingManager(val eventBus: PingEventBus = PingEventBus(), delay: Long) {
+	private var coroutine: Job? = null
 	private val coroutineScope = CoroutineScope(Dispatchers.Default)
 	private val mutex = Mutex()
+	var delay: Long = delay
+		set(value) {
+			val old = field
+			field = value
+			eventBus.onDelayChanged(old)
+			restartWatchdog()
+		}
 
 	val devices: HashMap<String, BluetoothDeviceState> = hashMapOf()
 
 	init {
-		coroutineScope.launch {
-			while (true) {
-				val t = System.currentTimeMillis()
-				watchdog() // +1
-				//delay(delay-System.currentTimeMillis()-t)
-				delay(delay)
-			}
-		}
+		restartWatchdog()
+
 	}
 
 	fun addDevice(device: BluetoothDeviceState): Boolean {
@@ -43,19 +46,19 @@ class PingManager(val eventBus: PingEventBus = PingEventBus(), var delay: Long) 
 		return true
 	}
 
-	private suspend fun _pingDevice(address: String) {
-		val device: BluetoothDeviceState? = devices[address]
-		if (device !is BluetoothDeviceState) return
+	private suspend fun _pingDevice(device: BluetoothDeviceState) {
 		mutex.withLock {
 			found(device)
 		}
 	}
 
-	fun pingDevice(address: String) {
+	fun pingDevice(address: String): Boolean {
 		Log.d("PingManager", "got ping by $address")
+		val device: BluetoothDeviceState = devices[address] ?: return false
 		runBlocking {
-			_pingDevice(address)
+			_pingDevice(device)
 		}
+		return true
 	}
 
 	private fun found(device: BluetoothDeviceState) {
@@ -81,10 +84,23 @@ class PingManager(val eventBus: PingEventBus = PingEventBus(), var delay: Long) 
 		eventBus.onDeviceLost(device)
 	}
 
-	private suspend fun watchdog() {
+	private suspend fun watchdogCycle() {
 		mutex.withLock {
 			devices.values.forEach { device: BluetoothDeviceState ->
 				retried(device)
+			}
+		}
+	}
+
+	private fun restartWatchdog() {
+		Log.d("watchdog", "watchdog restarted")
+		coroutine?.cancel()
+		coroutine = coroutineScope.launch {
+			while (true) {
+				val t = System.currentTimeMillis()
+				watchdogCycle() // +1
+				//delay(delay-System.currentTimeMillis()-t)
+				delay(delay)
 			}
 		}
 	}

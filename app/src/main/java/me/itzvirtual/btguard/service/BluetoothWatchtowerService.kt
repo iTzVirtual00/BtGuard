@@ -21,6 +21,7 @@ class BluetoothWatchtowerService : Service(), PingEvents {
 	private val binder: IBinder = LocalBinder()
 	private lateinit var bluetoothLeScanner: BluetoothLeScanner
 	lateinit var pingManager: PingManager
+	var scanning: Boolean = false
 
 	override fun onCreate() {
 		super.onCreate()
@@ -30,7 +31,6 @@ class BluetoothWatchtowerService : Service(), PingEvents {
 
 		pingManager = PingManager(delay = 2000)
 		pingManager.eventBus.register(this)
-		startBleScan()
 	}
 
 	private val scanCallback = object : ScanCallback() {
@@ -39,20 +39,33 @@ class BluetoothWatchtowerService : Service(), PingEvents {
 				pingManager.pingDevice(result.device.address)
 			}
 		}
+
+		override fun onBatchScanResults(results: MutableList<ScanResult>?) {
+			super.onBatchScanResults(results)
+			results?.forEach {
+				pingManager.pingDevice(it.device.address)
+			}
+		}
 	}
 
-	fun startBleScan() {
+	fun restartBleScan() {
+		if (scanning) stopBleScan()
 		Log.d("Service", "scan started")
 		bluetoothLeScanner.startScan(
 			listOf(ScanFilter.Builder().build()),
 			ScanSettings.Builder().setNumOfMatches(ScanSettings.MATCH_NUM_MAX_ADVERTISEMENT)
-				.setMatchMode(ScanSettings.MATCH_MODE_STICKY).build(),
+				.setMatchMode(ScanSettings.MATCH_MODE_STICKY)
+				.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+				.setReportDelay((pingManager.delay * 0.5).toLong()).build(),
 			scanCallback
 		)
+		scanning = true
 	}
 
 	private fun stopBleScan() {
+		Log.d("Service", "scan stopped")
 		bluetoothLeScanner.stopScan(scanCallback)
+		scanning = false
 	}
 
 	inner class LocalBinder : Binder() {
@@ -65,5 +78,9 @@ class BluetoothWatchtowerService : Service(), PingEvents {
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 		return START_STICKY
+	}
+
+	override fun onDelayChanged(oldDelay: Long) {
+		restartBleScan()
 	}
 }
