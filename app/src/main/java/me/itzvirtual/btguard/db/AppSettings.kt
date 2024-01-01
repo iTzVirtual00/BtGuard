@@ -9,5 +9,5 @@ data class AppSettings(
 	var devices: MutableList<BluetoothDeviceState> = mutableListOf()
 ) {
 	@Serializable
-	data class Settings(var retryDelay: Int = 3)
+	data class Settings(var retryDelay: Int = 2000)
 }

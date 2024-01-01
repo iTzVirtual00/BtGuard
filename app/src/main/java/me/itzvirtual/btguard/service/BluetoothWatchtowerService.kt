@@ -27,7 +27,8 @@ class BluetoothWatchtowerService : Service(), PingEvents {
 		Log.d("Service", "onCreate")
 		val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
 		bluetoothLeScanner = bluetoothManager.adapter.bluetoothLeScanner
-		pingManager = PingManager()
+
+		pingManager = PingManager(delay = 2000)
 		pingManager.eventBus.register(this)
 		startBleScan()
 	}
@@ -40,9 +41,8 @@ class BluetoothWatchtowerService : Service(), PingEvents {
 		}
 	}
 
-	private fun startBleScan() {
+	fun startBleScan() {
 		Log.d("Service", "scan started")
-		// bluetoothLeScanner.startScan(scanCallback)
 		bluetoothLeScanner.startScan(
 			listOf(ScanFilter.Builder().build()),
 			ScanSettings.Builder().setNumOfMatches(ScanSettings.MATCH_NUM_MAX_ADVERTISEMENT)

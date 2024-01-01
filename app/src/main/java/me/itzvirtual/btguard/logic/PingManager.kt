@@ -9,12 +9,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class PingManager(val eventBus: PingEventBus = PingEventBus()) {
+class PingManager(val eventBus: PingEventBus = PingEventBus(), var delay: Long) {
 	private val coroutineScope = CoroutineScope(Dispatchers.Default)
 	private val mutex = Mutex()
 
 	val devices: HashMap<String, BluetoothDeviceState> = hashMapOf()
-	private val delay: Long = 2000
 
 	init {
 		coroutineScope.launch {
@@ -70,9 +69,9 @@ class PingManager(val eventBus: PingEventBus = PingEventBus()) {
 
 	private fun retried(device: BluetoothDeviceState) {
 		device.currentRetries = minOf(device.currentRetries + 1, device.maxRetries + 1)
-		if (device.currentRetries > device.maxRetries) return;// already lost
+		if (device.currentRetries > device.maxRetries) return// already lost
 		Log.d("watchdog", "${device.address} retry(${device.currentRetries})")
-		if (device.currentRetries == device.maxRetries) lost(device); // just lost
+		if (device.currentRetries == device.maxRetries) lost(device) // just lost
 		// not lost yet
 	}
 
